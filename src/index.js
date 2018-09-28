@@ -1,59 +1,53 @@
 module.exports = function getZerosCount(number, base) {
+  let minZeros = 0,
+      dividers = []
 
-  var maxDiv = 0
-  var dividers = []
-   //ИЩЕМ МНОЖИТЕЛИ
-  while(base % 2 == 0)
+  //ИЩЕМ МНОЖИТЕЛИ
+  for(; base % 2 == 0; base /=2)
   {
-  	dividers[dividers.length] = 2
-  	base /= 2;
+  	dividers.push(2)
   }
 
-  for(var div = 3;div <= Math.sqrt(base);div+=2)
+
+  for(let div = 3; div <= Math.sqrt(base); div+=2)
   {
-  	while(base % div == 0)
+  	for(; base % div == 0; base /= div)
   	{
-  		dividers[dividers.length] = div
-  		base /= div
+  		dividers.push(div)
   	}
   }
-  if(base != 1)
+
+  if(base != 1) dividers.push(base)
+
+  //находим множитель имеющий наибольшее значение
+  let powers = []
+
+  dividers.forEach((div,i,dividers)=>
   {
- 	dividers[dividers.length] = base
-  }
+    powers[div] = powers[div] == undefined 
+                ? 1 
+                : powers[div] + 1
+  })
 
-  //нходим множитель дающий наибольшее произведение
-  var dividersPowers = []
 
-  for(var div of dividers)
+
+  
+  powers.forEach((currentPower,currentDiv,powers)=>
   {
-  	if(dividersPowers[div] != undefined)
-  		dividersPowers[div]++;
-  	else
-  		dividersPowers[div] = 1
-  } 
+  	if(typeof(currentDiv) == undefined)
+      return;
 
-  //console.log(dividersPowers)
-  //console.log(dividers)
-
-
-  var minZeros = 0;
-  for(var thisDiv in dividersPowers)
-  {
-  	if(typeof(thisDiv) == undefined)
-  		continue;
-
-  	var count = 0
-  	for(div = thisDiv; div <= number;div*=thisDiv)
-	{
-	  count += Math.floor(number / div)
-	}
-	count /= dividersPowers[thisDiv]
+  	let divCount = 0
+  	for(div = currentDiv; div <= number; div*=currentDiv)
+	  {
+	    divCount += Math.floor(number / div)
+	  }
+	  divCount /= currentPower
 	
 
-	if(minZeros == 0 || count < minZeros)
-		minZeros = count
-  }
+	  if(minZeros == 0 || divCount < minZeros)
+		  minZeros = divCount
+  })
 
   return Math.floor(minZeros)
 }
